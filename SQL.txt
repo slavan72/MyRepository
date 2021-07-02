@@ -1,0 +1,288 @@
+
+
+таблицы:
+
+CREATE TABLE my_contacts(
+last_name VARCHAR(30) NOT NULL,
+first_name VARCHAR(20) NOT NULL,
+email VARCHAR(50),
+gender CHAR(1),
+birthday DATE,
+profession VARCHAR(50),
+location VARCHAR(50),
+status VARCHAR(20),
+interests VARCHAR(100),
+seeking VARCHAR(100));
+
+CREATE TABLE actor (
+  actor_id smallint(5) unsigned NOT NULL AUTO_INCREMENT, - автоматически увеличивает номер
+  first_name varchar(45) NOT NULL,
+  last_name varchar(45) NOT NULL,
+  PRIMARY KEY (actor_id) - первичный ключ
+) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=utf8 - механизм хранения данных и кодировка символов
+
+связанные таблицы:
+
+CREATE TABLE interests (
+int_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+interest VARCHAR(50) NOT NULL,
+contact_id INT NOT NULL,
+CONSTRAINT my_contacts_contact_id_fk  - ограничения 
+FOREIGN KEY (contact_id)     - внешний ключ 
+REFERENCES my_contacts (contact_id));- ссылка на столбец в родительской таблице
+
+
+таблица создается командой CREATE с использованием данных команды SELECT, возвращающей значения столбца profession таблицы my contacts. Затем таблица изменяется командой ALTER с добавлением первичного ключа
+CREATE TABLE profession AS
+SELECT profession FROM my_contacts
+GROUP BY profession
+ORDER BY profession;
+
+ALTER TABLE profession
+ADD COLUMN id INT NOT NULL AUTO_INCREMENT FIRST,
+ADD PRIMARY KEY (id);
+
+команда CREATE создает таблицу profession со столбцом первичного ключа и столбцом VARCHAR для хранспня профессий одновременно с заполнением данными из запроса SELECT
+CREATE TABLE profession
+(
+id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+profession VARCHAR(20))
+AS 					 - AS направляет весь вывод SELECT в новую таблицу
+SELECT profession AS mc_prof FROM my_contacts  - столбец profession таблицы my_contacts может временно называться новым именем - mc_prof (сокращение от my_contacts profession) временное имя (псевдоним)
+GROUP BY mc_prof
+ORDER BY mc_prof;
+
+создать копию таблицы:
+CREATE TABLE <copytable> AS SELECT * FROM <table>;
+CREATE TABLE CustCopy AS SELECT * FROM Customers;
+
+представления:
+CREATE VIEW <viewName> AS
+SELECT <colum1>, <colum2>,... FROM <tableName1>, <tableName2>,...
+WHERE <tableName1>.<colum1> = <tableName2>.<colum1> AND <tableName1>.<colum2> = <tableName2>.<colum2>;
+
+CREATE VIEW productCustomers AS
+SELECT cust_name, cust_contact, prod_id FROM customers, orders, orderitems
+WHERE customers.cust_id = orders.cust_id AND orderitems.order_num = orders.order_num;
+
+Типы данных:
+
+CHAR(7) - текст определенной длинны
+VARCHAR(30) - текст до 255 символов
+CLOB - блоки текста 
+BLOB - блоки бинарных данных
+DATE - дата 
+DATETIME - дата и время
+DEC - числа с заданной точностью <variable> DEC(3,2) NOT NULL DEFAULT 1.00 - присвоить значение по умолчанию
+INT - целые числа(+/-)
+
+Функции:
+
+текстовые:
+LEFT() - возвращает символы из левой части строки 
+SELECT LEFT('asdf hjkl hjk', 3);
+
+RIGHT() - возвращает символы из правой части строки
+SELECT RIGHT('asdf hjkl hjk', 4);
+
+REVERSE() - разворачивает строку
+SELECT REVERSE('asdf');
+
+REPLACE() - заменяет символы
+SELECT REPLACE('a1s1d1f1', 1, 2); - заменяет 1 на 2
+
+LENGTH() - возвращает длинну строки
+SELECT LENGTH('asd hjk');
+
+LOWER() - преобразует строку в нижний регистр 
+SELECT LOWER('FGHJ KL:');
+
+UPPER() - преобразует строку в верхний регистр
+SELECT UPPER('asdf hjkl');
+
+LTRIM() - удаляет проббелы в левой части строки
+RTRIM() - удаляет проббелы в правой части строки
+
+ROUND() - округление числа 
+SELECT ROUND(1.2345);
+
+SOUNDEX() - возвращает значение SOUNDEX() - похожие по звучанию
+SELECT * FROM customers WHERE SOUNDEX(cust_contact) = SOUNDEX('Michaelle Green');
+
+CONCAT - конкатенация
+SELECT CONCAT (<colum1>, <colum2>) FROM <tableName>;
+SELECT CONCAT (vend_name, ' ',  vend_country) FROM vendors; 
+
+получение даты:
+NOW() - получение текущей даты и времени
+DATE() - дата(год-месяц-день)
+DAY() - день
+MONTH() - месяц
+YEAR() - год
+SELECT NOW();
+SELECT * FROM orders WHERE DATE(order_date) = '2012-02-03';
+SELECT * FROM orders WHERE DAY(order_date) = '03';
+
+итоговые функции:
+SUM - суммирует числа в стобце
+SELECT SUM(prod_price) FROM products;
+SELECT SUM(prod_price) FROM products WHERE vend_id = 'DLL01';
+ 
+AVG - возвращает среднее значение для числового столбца
+SELECT AVG(prod_price) FROM products;
+SELECT AVG(prod_price) FROM products WHERE vend_id = 'DLL01';
+
+MAX и MIN - возвращают наибольшее и наименьшее значения в столбце
+SELECT MAX(prod_price) FROM products;
+
+COUNT - возвращает целое число - сколько записей(строк) в столбце
+SELECT COUNT(*) FROM products;
+SELECT COUNT(*) FROM products WHERE vend_id = 'DLL01';
+
+комбинирование:
+SELECT COUNT(*) AS num_items,
+MIN(prod_price) AS price_min, 
+MAX(prod_price) AS price_max,
+AVG(prod_price) AS price_avg
+FROM products;
+
+SELECT vend_id, COUNT(*) FROM products GROUP BY vend_id;
+
+
+  
+Команды:
+
+SHOW DATABASES; - показать все доступные базы данных
+
+SHOW TABLES; - показать все доступные таблицы
+
+CREATE DATABASE <databaseName>; - создать БД
+
+USE DATABASE <databaseName>; - использовать БД
+ 
+CREATE TABLE <tableName> - создать таблицу
+
+DESC <tableName>; или DESCRIBE <tableName>; - посмотреть структуру таблицы
+
+DROP TABLE <tableName>; - уничтожить таблицу
+
+SHOW CREATE TABLE <tableName>; - показывает какими командами создавалась таблица
+
+SHOW COLUMNS FROM <tableName>; - Команда выводит описания всех столбцов таблицы с типами данных, а также другими сведениями, относящимся к конкретным столбцам.
+
+
+INSERT INTO - добавление данных в таблицу:
+INSERT INTO <tableName> (<columName1>, <columName2>,...) VALUES ('значение1', 'значение2,...);
+
+
+просмотр записей:
+
+SELECT * FROM my_contacts; посмотреть всю(*) таблицу (Звездочка (*) приказывает РСУБД вернуть значения всех столбцов таблицы)
+SELECT * FROM my_contacts WHERE first_name = 'Anna'; посмотреть записи где  столбец first_name содержит 'Anna' 
+
+SELECT location, rating FROM doughnut_ratings WHERE first_name ='plain glazed' посмотреть столбцы location и rating где first_name ='plain glazed'
+SELECT drink_name FROM drink_info WHERE drink_name >= 'Г' AND drink name < 'Д';
+SELECT drink_name FROM easy_drinks WHERE main = 'апельсиновый сок' OR(AND) main = 'яблочный сок';
+SELECT first_name FROM my_contacts WHERE first_name LIKE '%им'; - LIKE в сочетании со специальными символами ищет часть текстовой строки, знак % — обозначает любое количество произвольных символов
+SELECT name FROM drink_info WHERE calories BETWEEN 60 AND 30; - если значение столбца находиться в указанном диапазоне
+SELECT name FROM book WHERE rating IN ('оригинально', 'потрясающе', 'неплохо') ; - если значение столбца совпадает с одним из значений набора
+SELECT name FROM book WHERE rating NOT IN ('оригинально', 'потрясающе', 'неплохо') ; - если значение столбца НЕ совпадает ни с одним из значений набора
+SELECT name FROM ORDER BY parametr; - сортировать по parametr в алфавитном порядке(от меньшего к большему)
+SELECT name FROM GROUP BY parametr; - группировать по parametr
+SELECT name FROM HAVING parametr;
+
+SUBSTRING_INDEX() - выделяет часть содержимого столбца(подстроку)
+SELECT SUBSTRING_INDEX(<columName>, ',', 1) FROM <tableName> ; - ищет текст, заключенный в апострофы (запятая в данном случае), и возвращает все символы, предшествующие ему.
+
+SELECT * FROM movie_table ORDER BY category, purchased, title; - упорядочивание столбцов
+SELECT * FROM movie_table ORDER BY title DESC;
+SELECT title, category FROM movie_table WHERE category = 'family' ORDER BY title;
+SELECT title, category FROM movie_table WHERE category = 'family' ORDER BY title, purchased;
+SELECT SUM(sales) FROM cookie_sales WHERE first_name = 'Nicole';
+
+ORDER BY - упорядочивает результаты в столбце
+SELECT * FROM <tableName> ORDER BY <columName>; - упорядочивание столбца <columName>
+SELECT * FROM <tableName> ORDER BY <columName> DESC; - упорядочивание столбца в обратном порядке
+
+группировка
+GROUP BY - группирует записи по одинаковым значениям
+SELECT vend_id, COUNT(*) FROM products GROUP BY vend_id;
+
+HAVING - то же условие фильтрации, что и WHERE только работает с группами
+SELECT cust_id, COUNT(*) FROM orders GROUP BY cust_id HAVING COUNT(*) >=2; - HAVING фильтрует группы с помощью выражения COUNT(*) >=2
+ 
+
+
+DISTINCT - возвращает уникальные значения, без дубликатов
+SELECT DISTINCT <columName> FROM <tableName>; - возвращает уникальные значения столбца <columName>
+
+LIMIT - сколько записей должен вернуть запрос
+SELECT * FROM <tableName> LIMIT 3 - возвращает три первых записи 
+SELECT * FROM <tableName> LIMIT 4, 2; - возвращает две записи начиная с четвертой = SELECT * FROM <tableName> LIMIT 2 OFFSET 4;
+ 
+SELECT first_name, SUM(sales)  - Суммирует данные столбца «sales»
+FROM cookie_sales GROUP BY first_name - Группируем значения столбца «first_name».
+ORDER BY SUM(sales); - Упорядочение по функции SUM
+
+SELECT first_name, AVG(sales)  - вычисляет средне значение данные столбца «sales»
+FROM cookie_sales GROUP BY first_name; - Группируем значения столбца «first_name».
+ORDER BY AVG(sales); - Упорядочение по функции AVG
+
+SELECT first_name, MIN(sales)  - Суммирует данные столбца «sales»
+FROM cookie_sales GROUP BY first_name - Группируем значения столбца «first_name».
+ORDER BY SUM(sales); - Упорядочение по функции SUM
+
+ALTER TABLE <tableName>  ADD COLUMN <columName> VARCHAR(10) FIRST; - добавление первого столбца
+ALTER TABLE <tableName>  ADD COLUMN <columName> INT AFTER/BEFORE <firstcolumName>; - добавление столбца <columName> после/перед столбца(ом) <firstcolumName>;
+ALTER TABLE <tableName>  ADD COLUMN <columName> INT NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (<columName>);contact_id
+ALTER TABLE <tableName> RENAME TO <newName>; - переименование таблицы
+ALTER TABLE <tableName> MODIFY <colum_1> VARCHAR(12) AFTER <colum_2>; - перемещение столбца <colum_1> после столбца
+
+
+UPDATE - изменение данных в таблице:
+
+UPDATE <tableName> SET <columName> = новое_значение WHERE <columName> = старое_значение;
+UPDATE <tableName> SET <field1> = 'newValue'  WHERE <field2> = <Value>; - изменит значение всех полей <field> в таблице <tableName>
+UPDATE city SET city_name = 'Rogachovo' WHERE city_id = 2; 
+UPDATE my_contacts SET state = RIGHT(location, 2); - функция выделяет два последних символа из старого столбца location и помещает их в новый столбец state.
+
+
+DELETE - удаление данных из таблицы:
+DELETE FROM <tableName> WHERE <field1> = <Value>;
+DELETE FROM city WHERE  city_id = 3;
+
+ 
+CHANGE - изменение имени и типа данных столбцов
+MODIFY - изменение типа данных или позиции столбцов
+ADD - добавление столбцов в таблицу
+DROP- удаление столбцов из таблицы
+ALTER TABLE <tableName> DROP COLUMN <columName>;
+
+UPDATE my_table
+SET <новый_столбец> =  - Этому столбцу присваивается одноиз перечисленных ниже значении.
+
+CASE
+ 	WHEN столбец1 = значение1 - ЕСЛИ выполняется это условие
+	THEN новое_значение1      - ТО столбцу «новый_столбец» присваивается это значение.
+
+	WHEN столбец2 = значение2 - ЕСЛИ выполняетсядругое условие
+	THEN новое_значение2      - ТО столбцу «новый_столбец» присваивается другое значение.
+
+	ELSE <значениеЗ>
+
+END; - Завершает выражение CASE и всю команду
+
+объеденение таблиц:
+объеденение по равенству основано на проверке равенства дух таблиц WHERE <tablename1>.<comumname1> = <tablename2>.<comumname2>;
+SELECT <comumname1>, <comumname2>, ... FROM <tablename1>, <tablename2> WHERE <tablename1>.<comumname1> = <tablename2>.<comumname2>;
+SELECT vend_name, prod_name, prod_price FROM Vendors, Products WHERE Vendors.vend_id = Products.vend_id;
+
+самообъеденение:(используем псевдонимы чтобы обратиться к нескольким столбцам одной таблицы)
+SELECT C.*, O.order_date, OI.prod_id, OI.quantity, OI.item_price 
+FROM customers AS C, orders AS O, orderitems AS OI
+WHERE C.cust_id = O.cust_id AND OI.order_num = O.order_num AND prod_id = 'RGAN01';
+
+INNER JOIN:
+SELECT * FROM <tablename1> INNER JOIN <tablename2> ON <tablename1>.<comumname1> = <tablename2>.<comumname2>;;
+SELECT * FROM autors INNER JOIN books ON autors.autor_id = books.book_id;
+
